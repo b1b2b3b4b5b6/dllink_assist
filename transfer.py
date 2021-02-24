@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-24 06:17:11
-LastEditTime: 2021-02-24 14:10:00
+LastEditTime: 2021-02-24 16:31:05
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\transfer.py
@@ -34,7 +34,7 @@ class StatusControlThread(threading.Thread):
     short_path_dict = {}
     thread_close_flag = False
 
-    def transfer(self, status, delay=500):
+    def transfer(self, status, delay_ms=500):
         next_status_dict = self.status_dict[self.now_status].transfer_dict
         if status not in next_status_dict:
             logging.error(
@@ -44,7 +44,7 @@ class StatusControlThread(threading.Thread):
         ope = tool.Operation(tool.Operation.CLICK, [
                              next_status_dict[status]['xy']])
         ope.action()
-        time.sleep(delay)
+        time.sleep(delay_ms/1000)
         if self.check_status(status) == True:
             self.now_status = status
             logging.info(f'transfer success, {self}')
@@ -63,11 +63,13 @@ class StatusControlThread(threading.Thread):
 
             if self.now_status == 'STATUS_BASE':
                 self.search_status()
-            elif self.now_status != self.target_status:
-                if self.target_status not in self.short_path_dict:
+                continue
+
+            if self.now_status != self.target_status:
+                if self.target_status not in self.short_path_dict[self.now_status]:
                     logging.error(f'can not reach targer status, {self}')
                     assert(None)
-                next_status = self.short_path_dict[self.target_status]
+                next_status = self.short_path_dict[self.now_status][self.target_status][1]
                 self.transfer(next_status, 300)
 
     def stop(self):
@@ -82,16 +84,19 @@ class StatusControlThread(threading.Thread):
                 for k, v in self.status_dict[name].transfer_dict.items():
                     self.G.add_edge(name, k)
         self.status_dict.pop('STATUS_BASE')
-        self.shot_path_dict = dict(nx.all_pairs_shortest_path(self.G))
+        self.short_path_dict = dict(nx.all_pairs_shortest_path(self.G))
         self.search_status()
 
     def __str__(self):
         return f'now_status[{self.now_status}] target_status[{self.target_status}]'
 
     def show_map(self):
-        nx.draw(self.G, with_labels=True, edge_color='b',
-                node_color='g', node_size=1000)
-        plt.show()
+        for k, v in self.short_path_dict.items():
+            print(k)
+            print(v)
+        # nx.draw(self.G, with_labels=True, edge_color='b',
+        #         node_color='g', node_size=1000)
+        # plt.show()
 
     def check_status(self, expect_status, refresh=True):
         if refresh == True:
@@ -131,7 +136,3 @@ class StatusControlThread(threading.Thread):
 
     def set_target_status(self, expect_status):
         self.target_status = expect_status
-
-
-t = StatusControlThread()
-t.show_map()

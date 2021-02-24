@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2021-02-24 14:45:17
+LastEditTime: 2021-02-24 16:36:19
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -87,11 +87,12 @@ class Operation:
 
     def click(self, xy):
         global base_point
+        pyautogui.moveTo(*xy, 0)
         pymouse.PyMouse().click(*map(sum, zip(xy, base_point)), 1)
 
     def slide(self, xy_start, xy_stop):
         pymouse.PyMouse().press(*map(sum, zip(xy_start, base_point)))
-        pyautogui.moveTo(*map(sum, zip(xy_stop, base_point)), 0)
+        pyautogui.moveTo(*map(sum, zip(xy_stop, base_point)), 0.5)
         pymouse.PyMouse().release(*map(sum, zip(xy_stop, base_point)))
 
     def check_point(self, point):
@@ -103,7 +104,7 @@ class Operation:
     def action(self):
         if self.act_name == self.CLICK:
             self.check_point(self.cv_res[0])
-            self.click(get_center_point(self.cv_res))
+            self.click(self.cv_res[0])
 
         elif self.act_name == self.SLIDE:
             if self.cv_res[0] == None and self.cv_res[1] == None:
@@ -121,6 +122,7 @@ def retry(func, count=1, delay_ms=0):
     for n in range(count):
         if func() == True:
             return True
+        time.sleep(delay_ms / 1000)
     return False
 
 
