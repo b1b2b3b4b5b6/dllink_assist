@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-24 06:17:11
-LastEditTime: 2021-02-24 16:31:05
+LastEditTime: 2021-02-24 16:56:23
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\transfer.py
@@ -77,6 +77,7 @@ class StatusControlThread(threading.Thread):
         self.join()
 
     def __init__(self):
+        tool.Operation().reset_base_point()
         super().__init__()
         for mn in reg_list:
             for name, class_ in inspect.getmembers(sys.modules[mn], inspect.isclass):
