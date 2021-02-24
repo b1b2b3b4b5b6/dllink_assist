@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-24 06:17:11
-LastEditTime: 2021-02-24 16:56:23
+LastEditTime: 2021-02-24 17:11:14
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\transfer.py
@@ -82,7 +82,7 @@ class StatusControlThread(threading.Thread):
         for mn in reg_list:
             for name, class_ in inspect.getmembers(sys.modules[mn], inspect.isclass):
                 self.status_dict[name] = class_()
-                for k, v in self.status_dict[name].transfer_dict.items():
+                for k, _ in self.status_dict[name].transfer_dict.items():
                     self.G.add_edge(name, k)
         self.status_dict.pop('STATUS_BASE')
         self.short_path_dict = dict(nx.all_pairs_shortest_path(self.G))
@@ -95,9 +95,9 @@ class StatusControlThread(threading.Thread):
         for k, v in self.short_path_dict.items():
             print(k)
             print(v)
-        # nx.draw(self.G, with_labels=True, edge_color='b',
-        #         node_color='g', node_size=1000)
-        # plt.show()
+        nx.draw(self.G, with_labels=True, edge_color='b',
+                node_color='g', node_size=1000)
+        plt.show()
 
     def check_status(self, expect_status, refresh=True):
         if refresh == True:
