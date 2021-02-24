@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2021-02-22 01:34:26
+LastEditTime: 2021-02-24 14:45:17
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -11,6 +11,7 @@ import pymouse
 import numpy
 import cv2 as cv
 import logging
+import time
 
 
 def find_img(background, target, similarity=0.95):
@@ -54,14 +55,7 @@ def get_screenshot():
     return 'screenshot.png'
 
 
-def click(xy):
-    pymouse.PyMouse().click(xy[0], xy[1], 1)
-
-
-def slide(xy_start, xy_stop):
-    pymouse.PyMouse().press(xy_start[0], xy_start[1])
-    pyautogui.moveTo(xy_stop[0], xy_stop[1], 0)
-    pymouse.PyMouse().release(xy_stop[0], xy_stop[1])
+base_point = None
 
 
 class Operation:
@@ -72,8 +66,33 @@ class Operation:
     act_name = ''
     cv_res = [None, None]
 
+    def __init__(self, act_name='', cv_res=[None, None]):
+        self.act_name = act_name
+        self.cv_res = cv_res
+        if base_point == None:
+            self.reset_base_point()
+
     def __str__(self):
         return f'Operation[{self.ope_name}][{self.act_name}][{self.cv_res[0]}][{self.cv_res[1]}]'
+
+    def reset_base_point(self):
+        global base_point
+        xy = find_img(capture_screenshot(), 'img/main/head.png')
+        if xy == None:
+            logging.error('can not find base_point')
+            assert(None)
+        else:
+            base_point = get_left_lower_point(xy)
+            logging.info(f'base point is {base_point}')
+
+    def click(self, xy):
+        global base_point
+        pymouse.PyMouse().click(*map(sum, zip(xy, base_point)), 1)
+
+    def slide(self, xy_start, xy_stop):
+        pymouse.PyMouse().press(*map(sum, zip(xy_start, base_point)))
+        pyautogui.moveTo(*map(sum, zip(xy_stop, base_point)), 0)
+        pymouse.PyMouse().release(*map(sum, zip(xy_stop, base_point)))
 
     def check_point(self, point):
         if point == None:
@@ -84,13 +103,28 @@ class Operation:
     def action(self):
         if self.act_name == self.CLICK:
             self.check_point(self.cv_res[0])
-            click(get_center_point(self.cv_res))
+            self.click(get_center_point(self.cv_res))
 
         elif self.act_name == self.SLIDE:
-            self.check_point(self.start_point)
             if self.cv_res[0] == None and self.cv_res[1] == None:
                 self.check_point(None)
-
-            slide(self.cv_res[0], self.cv_res[1])
+            self.slide(self.cv_res[0], self.cv_res[1])
         else:
             self.check_point(None)
+
+
+def retry(func, count=1, delay_ms=0):
+    if count == 0:
+        logging.error(f'retry count can not[{count}] < 0')
+        assert(None)
+
+    for n in range(count):
+        if func() == True:
+            return True
+    return False
+
+
+def log_error_screen(name):
+    img = pyautogui.screenshot()  # x,y,w,h
+    img.save(time.strftime('err_%m%d%H%M%S_',
+                           time.localtime()) + name + '.png')

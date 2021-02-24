@@ -1,15 +1,15 @@
 '''
 Author: your name
 Date: 2021-02-23 11:08:45
-LastEditTime: 2021-02-24 07:18:32
+LastEditTime: 2021-02-24 13:23:28
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\base_reg.py
 '''
 import tool
+from dict_recursive_update import recursive_update
 
 HANDLE_REFRESH = 'HANDLE_REFRESH'
-HNADLE_RECONECT = 'HNADLE_RECONECT'
 
 
 class STATUS_BASE:
@@ -22,16 +22,22 @@ class STATUS_BASE:
                 'xy': [1, 1]
             }
         }
-        self.staimg_dict = {}
-        self.event_dict = {
-            'EVENT_LOSE_CONNECT': {
-                'img': '',
-                'handle_list': [
-                    {
-                        'ope_name': HNADLE_RECONECT,
-                        'act_name': tool.Operation.CLICK,
-                        'xy': [1, 1]
-                    }
-                ]
+        self.staimg_list = {}
+
+
+class STATUS_LOSS_CONNECT(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_BASE': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [1, 1]
             }
         }
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = []

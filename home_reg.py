@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 23:54:10
-LastEditTime: 2021-02-24 06:27:04
+LastEditTime: 2021-02-24 13:23:20
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\detect.py
@@ -43,8 +43,7 @@ class STATUS_MAIN(STATUS_BASE):
         custom_dict = {}
         recursive_update(self.handle_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.staimg_dict, custom_dict)
+        self.staimg_list = []
 
 
 class STATUS_MAIN_PVP(STATUS_MAIN):
@@ -69,8 +68,7 @@ class STATUS_MAIN_PVP(STATUS_MAIN):
         custom_dict = {}
         recursive_update(self.handle_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.staimg_dict, custom_dict)
+        self.staimg_list = []
 
 
 class STATUS_MAIN_STORE(STATUS_MAIN):
@@ -95,8 +93,7 @@ class STATUS_MAIN_STORE(STATUS_MAIN):
         custom_dict = {}
         recursive_update(self.handle_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.staimg_dict, custom_dict)
+        self.staimg_list = []
 
 
 class STATUS_MAIN_WORK(STATUS_MAIN):
@@ -121,5 +118,4 @@ class STATUS_MAIN_WORK(STATUS_MAIN):
         custom_dict = {}
         recursive_update(self.handle_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.staimg_dict, custom_dict)
+        self.staimg_list = []
