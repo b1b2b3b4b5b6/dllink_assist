@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2021-02-24 16:36:19
+LastEditTime: 2021-02-25 19:47:08
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -18,7 +18,6 @@ def find_img(background, target, similarity=0.95):
 
     source = cv.imread(background)
     template = cv.imread(target)
-    cv.imshow('img', template)
     result = cv.matchTemplate(source, template, cv.TM_CCOEFF_NORMED)
     start_point = cv.minMaxLoc(result)[3]
     end_point = [start_point[0] + template.shape[1],

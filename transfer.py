@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-24 06:17:11
-LastEditTime: 2021-02-24 17:11:14
+LastEditTime: 2021-02-25 21:50:21
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\transfer.py
@@ -13,6 +13,7 @@ import inspect
 import tool
 import sys
 import home_reg
+import duel
 import base_reg
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -24,15 +25,27 @@ logging.basicConfig(level=logging.DEBUG)
 
 reg_list = ['base_reg', 'home_reg']
 
+delay_dict = {
+    'STATUS_TRANSDOOR_DUEL': 14000
+}
+
 
 class StatusControlThread(threading.Thread):
 
     now_status = 'STATUS_BASE'
     target_status = 'STATUS_BASE'
+    next_status = 'STATUS_BASE'
     status_dict = {}
     G = nx.DiGraph()
     short_path_dict = {}
     thread_close_flag = False
+
+    def exec_delay(self, status):
+        if status in delay_dict.keys():
+            logging.info(f'exec [{status}] delay[{delay_dict[status]}]')
+            time.sleep(delay_dict[status] / 1000)
+        else:
+            time.sleep(1000 / 1000)
 
     def transfer(self, status, delay_ms=500):
         next_status_dict = self.status_dict[self.now_status].transfer_dict
@@ -44,7 +57,8 @@ class StatusControlThread(threading.Thread):
         ope = tool.Operation(tool.Operation.CLICK, [
                              next_status_dict[status]['xy']])
         ope.action()
-        time.sleep(delay_ms/1000)
+
+        self.exec_delay(status)
         if self.check_status(status) == True:
             self.now_status = status
             logging.info(f'transfer success, {self}')
@@ -65,19 +79,24 @@ class StatusControlThread(threading.Thread):
                 self.search_status()
                 continue
 
+            if self.now_status == 'STATUS_TRANSDOOR_DUEL':
+                duel.loop()
+                self.now_status = 'STATUS_BASE'
+                continue
+
             if self.now_status != self.target_status:
                 if self.target_status not in self.short_path_dict[self.now_status]:
                     logging.error(f'can not reach targer status, {self}')
                     assert(None)
-                next_status = self.short_path_dict[self.now_status][self.target_status][1]
-                self.transfer(next_status, 300)
+                self.next_status = self.short_path_dict[self.now_status][self.target_status][1]
+
+                self.transfer(self.next_status)
 
     def stop(self):
         self.thread_close_flag = True
         self.join()
 
     def __init__(self):
-        tool.Operation().reset_base_point()
         super().__init__()
         for mn in reg_list:
             for name, class_ in inspect.getmembers(sys.modules[mn], inspect.isclass):
@@ -89,7 +108,7 @@ class StatusControlThread(threading.Thread):
         self.search_status()
 
     def __str__(self):
-        return f'now_status[{self.now_status}] target_status[{self.target_status}]'
+        return f'now_status[{self.now_status}] next_status[{self.next_status}] target_status[{self.target_status}]'
 
     def show_map(self):
         for k, v in self.short_path_dict.items():
