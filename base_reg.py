@@ -1,15 +1,13 @@
 '''
 Author: your name
 Date: 2021-02-23 11:08:45
-LastEditTime: 2021-02-25 21:21:22
+LastEditTime: 2021-02-26 00:23:23
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\base_reg.py
 '''
 import tool
 from dict_recursive_update import recursive_update
-
-HANDLE_REFRESH = 'HANDLE_REFRESH'
 
 
 class STATUS_BASE:
@@ -27,7 +25,7 @@ class STATUS_LOSSCONNECT(STATUS_BASE):
         custom_dict = {
             'STATUS_MAIN': {
                 'act_name': tool.Operation.CLICK,
-                'xy': [387, 551]
+                'xy': [380, 536]
             }
         }
         recursive_update(self.transfer_dict, custom_dict)
@@ -67,7 +65,7 @@ class STATUS_REPORT(STATUS_BASE):
         custom_dict = {
             'STATUS_MAIN': {
                 'act_name': tool.Operation.CLICK,
-                'xy': [41, 950]
+                'xy': [44, 930]
             }
         }
         recursive_update(self.transfer_dict, custom_dict)

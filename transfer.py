@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-24 06:17:11
-LastEditTime: 2021-02-25 21:50:21
+LastEditTime: 2021-02-25 23:05:23
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\transfer.py
@@ -21,12 +21,11 @@ import logging
 import threading
 import time
 
-logging.basicConfig(level=logging.DEBUG)
 
 reg_list = ['base_reg', 'home_reg']
 
 delay_dict = {
-    'STATUS_TRANSDOOR_DUEL': 14000
+    'STATUS_TRANSDOOR_DUEL': 16000
 }
 
 
@@ -98,6 +97,7 @@ class StatusControlThread(threading.Thread):
 
     def __init__(self):
         super().__init__()
+        tool.Operation()
         for mn in reg_list:
             for name, class_ in inspect.getmembers(sys.modules[mn], inspect.isclass):
                 self.status_dict[name] = class_()
@@ -125,7 +125,7 @@ class StatusControlThread(threading.Thread):
         staimg_list = cs.staimg_list
         res = True
         for img in staimg_list:
-            xy = tool.find_img(tool.get_screenshot(), img)
+            xy = tool.find_img(tool.get_app_screenshot(), img)
 
             if xy == None:
                 logging.debug(
@@ -144,9 +144,10 @@ class StatusControlThread(threading.Thread):
                 if self.check_status(s, False) == True:
                     self.now_status = s
                     return True
+            tool.kick_ass()
             return False
 
-        if tool.retry(check, 3, 500) == False:
+        if tool.retry(check, 4, 1000) == False:
             logging.error('can not search status')
             tool.log_error_screen('search_status')
             assert(None)

@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2021-02-25 19:47:08
+LastEditTime: 2021-02-26 00:37:58
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -14,11 +14,12 @@ import logging
 import time
 
 
-def find_img(background, target, similarity=0.95):
+template = None
 
-    source = cv.imread(background)
+
+def find_img(background, target, similarity=0.95):
     template = cv.imread(target)
-    result = cv.matchTemplate(source, template, cv.TM_CCOEFF_NORMED)
+    result = cv.matchTemplate(background, template, cv.TM_CCOEFF_NORMED)
     start_point = cv.minMaxLoc(result)[3]
     end_point = [start_point[0] + template.shape[1],
                  start_point[1] + template.shape[0]]
@@ -45,13 +46,17 @@ def get_right_upper_point(xy):
 
 
 def capture_screenshot():
+    global source
     img = pyautogui.screenshot()  # x,y,w,h
     img.save('screenshot.png')
-    return 'screenshot.png'
+    source = cv.imread('screenshot.png')
+
+    return source
 
 
-def get_screenshot():
-    return 'screenshot.png'
+def get_app_screenshot():
+    global source
+    return source[base_point[1]:(base_point[1] + 960), base_point[0]:(base_point[0] + 540)]
 
 
 base_point = None
@@ -91,7 +96,7 @@ class Operation:
 
     def slide(self, xy_start, xy_stop):
         pymouse.PyMouse().press(*map(sum, zip(xy_start, base_point)))
-        pyautogui.moveTo(*map(sum, zip(xy_stop, base_point)), 0.5)
+        pyautogui.moveTo(*map(sum, zip(xy_stop, base_point)), 0.3)
         pymouse.PyMouse().release(*map(sum, zip(xy_stop, base_point)))
 
     def check_point(self, point):
@@ -129,3 +134,14 @@ def log_error_screen(name):
     img = pyautogui.screenshot()  # x,y,w,h
     img.save(time.strftime('err_%m%d%H%M%S_',
                            time.localtime()) + name + '.png')
+
+
+def check_lose_connect():
+    if find_img(get_app_screenshot(), 'img/main/loss_connect.png') != None:
+        return True
+    else:
+        return False
+
+
+def kick_ass():
+    Operation(Operation.CLICK, [[2, 620]]).action()

@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-25 20:25:40
-LastEditTime: 2021-02-25 21:57:19
+LastEditTime: 2021-02-25 23:19:22
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\duel.py
@@ -14,12 +14,15 @@ import logging
 
 def get_status():
     tool.capture_screenshot()
-    if tool.find_img(tool.get_screenshot(), 'img/duel/your_action_turn.png') != None:
+    if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_action_turn.png') != None:
         return 'ACTION'
-    if tool.find_img(tool.get_screenshot(), 'img/duel/your_battle_turn.png') != None:
+    if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_battle_turn.png') != None:
         return 'BATTLE'
 
-    if tool.find_img(tool.get_screenshot(), 'img/duel/save_replay.png') != None and tool.find_img(tool.get_screenshot(), 'img/duel/record.png') != None:
+    if tool.find_img(tool.get_app_screenshot(), 'img/duel/record.png') != None:
+        return 'COMPLETE'
+
+    if tool.check_lose_connect() == True:
         return 'COMPLETE'
 
     for i in range(3):
@@ -28,64 +31,58 @@ def get_status():
 
 
 def refresh():
-    ope = tool.Operation(tool.Operation.CLICK, [[9, 482]])
-    ope.action()
+    double_click([9, 482], 200)
+
+
+def double_click(xy, dur=400):
+    tool.Operation(tool.Operation.CLICK, [xy]).action()
+    time.sleep(dur / 1000)
+
+    tool.Operation(tool.Operation.CLICK, [xy]).action()
+    time.sleep(dur / 1000)
 
 
 def reset_sight():
-    ope = tool.Operation(tool.Operation.CLICK, [[9, 482]])
-    ope.action()
-    ope = tool.Operation(tool.Operation.CLICK, [[9, 482]])
-    ope.action()
+    time.sleep(0.5)
+    double_click([9, 482], 100)
     time.sleep(1)
 
 
 def call():
     logging.debug('select monster')
-    ope = tool.Operation(tool.Operation.SLIDE, [[202, 913], [260, 563]])
-    ope.action()
-    time.sleep(1)
+    tool.Operation(tool.Operation.SLIDE, [[202, 913], [260, 563]]).action()
+
+    time.sleep(0.4)
 
     logging.debug('call monster')
-    ope = tool.Operation(tool.Operation.CLICK, [[209, 728]])
-    ope.action()
-    time.sleep(3)
+    tool.Operation(tool.Operation.CLICK, [[209, 728]]).action()
 
+    time.sleep(2)
     logging.debug('enter battle')
-    ope = tool.Operation(tool.Operation.CLICK, [[510, 630]])
-    ope.action()
-    time.sleep(0.5)
-    ope = tool.Operation(tool.Operation.CLICK, [[510, 630]])
-    ope.action()
-    time.sleep(0.5)
+    double_click([510, 630], 1000)
+    time.sleep(1)
 
 
 def battle():
     logging.debug('attack 1')
     reset_sight()
-    ope = tool.Operation(tool.Operation.SLIDE, [[160, 556], [281, 358]])
-    ope.action()
+    tool.Operation(tool.Operation.SLIDE, [[160, 556], [281, 358]]).action()
     time.sleep(2)
 
     logging.debug('attack 2')
     reset_sight()
-    ope = tool.Operation(tool.Operation.SLIDE, [[274, 553], [281, 358]])
-    ope.action()
+    tool.Operation(tool.Operation.SLIDE, [[274, 553], [281, 358]]).action()
+    refresh()
     time.sleep(2)
 
     logging.debug('attack 3')
     reset_sight()
-    ope = tool.Operation(tool.Operation.SLIDE, [[382, 553], [281, 358]])
-    ope.action()
+    tool.Operation(tool.Operation.SLIDE, [[382, 553], [281, 358]]).action()
+    refresh()
     time.sleep(2)
 
     logging.debug('end turn')
-    ope = tool.Operation(tool.Operation.CLICK, [[510, 630]])
-    ope.action()
-    time.sleep(0.5)
-    ope = tool.Operation(tool.Operation.CLICK, [[510, 630]])
-    ope.action()
-    time.sleep(0.5)
+    double_click([510, 630], 800)
 
 
 def loop():
