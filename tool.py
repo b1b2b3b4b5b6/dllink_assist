@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2021-02-26 00:37:58
+LastEditTime: 2021-02-26 20:56:51
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -65,14 +65,17 @@ base_point = None
 class Operation:
     CLICK = 'click'
     SLIDE = 'slide'
+    CLICK_ON_IMG = 'CLICK_ON_IMG'
 
     ope_name = ''
     act_name = ''
     cv_res = [None, None]
+    img = ''
 
-    def __init__(self, act_name='', cv_res=[None, None]):
+    def __init__(self, act_name='', cv_res=[None, None], img=''):
         self.act_name = act_name
         self.cv_res = cv_res
+        self.img = img
         if base_point == None:
             self.reset_base_point()
 
@@ -102,7 +105,7 @@ class Operation:
     def check_point(self, point):
         if point == None:
             logging.error(
-                f'Operation[{self.ope_name}][{self.act_name}][{self.cv_res[0]}][{self.cv_res[1]}] illgal')
+                f'Operation[{self.ope_name}][{self.act_name}][{self.cv_res}][{self.img}] illgal')
             assert(None)
 
     def action(self):
@@ -114,6 +117,12 @@ class Operation:
             if self.cv_res[0] == None and self.cv_res[1] == None:
                 self.check_point(None)
             self.slide(self.cv_res[0], self.cv_res[1])
+        elif self.act_name == self.CLICK_ON_IMG:
+            res = find_img(get_app_screenshot(), self.img)
+            if None == res:
+                logging.error(f'can not action click on img[{self.img}]')
+            else:
+                self.click(get_center_point(res))
         else:
             self.check_point(None)
 

@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-23 11:08:45
-LastEditTime: 2021-02-26 00:23:23
+LastEditTime: 2021-02-26 20:55:19
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\base_reg.py
@@ -75,4 +75,24 @@ class STATUS_REPORT(STATUS_BASE):
 
         self.staimg_list = [
             'img/main/report.png'
+        ]
+
+
+class STATUS_GOOD(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_MAIN': {
+                'act_name': tool.Operation.CLICK_ON_IMG,
+                'img': 'img/main/good.png'
+            }
+        }
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = [
+            'img/main/good.png'
         ]

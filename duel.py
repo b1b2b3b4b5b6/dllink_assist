@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-25 20:25:40
-LastEditTime: 2021-02-25 23:19:22
+LastEditTime: 2021-02-26 19:18:36
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\duel.py
@@ -17,6 +17,9 @@ def get_status():
     if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_action_turn.png') != None:
         return 'ACTION'
     if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_battle_turn.png') != None:
+        return 'BATTLE'
+    if tool.find_img(tool.get_app_screenshot(), 'img/duel/continue_attack.png') != None:
+        tool.Operation(tool.Operation.CLICK, [[381, 524]]).action()
         return 'BATTLE'
 
     if tool.find_img(tool.get_app_screenshot(), 'img/duel/record.png') != None:

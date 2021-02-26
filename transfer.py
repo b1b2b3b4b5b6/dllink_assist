@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-24 06:17:11
-LastEditTime: 2021-02-25 23:05:23
+LastEditTime: 2021-02-26 23:25:16
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\transfer.py
@@ -20,12 +20,13 @@ import matplotlib.pyplot as plt
 import logging
 import threading
 import time
-
+from dict_recursive_update import recursive_update
 
 reg_list = ['base_reg', 'home_reg']
 
 delay_dict = {
-    'STATUS_TRANSDOOR_DUEL': 16000
+    'STATUS_TRANSDOOR_DUEL': 16000,
+    "STATUS_NPC_DUEL_AUTO": 10000
 }
 
 
@@ -38,6 +39,22 @@ class StatusControlThread(threading.Thread):
     G = nx.DiGraph()
     short_path_dict = {}
     thread_close_flag = False
+
+    def goto_status(self, status, delay_s=180):
+        if self.now_status == status:
+            return True
+        self.set_target_status(status)
+        if delay_s == 0:
+            while self.now_status != status:
+                time.sleep(1)
+        else:
+            while delay_s >= 0 and self.now_status != status:
+                time.sleep(1)
+                delay_s -= 1
+        if self.now_status == status:
+            return True
+        else:
+            return False
 
     def exec_delay(self, status):
         if status in delay_dict.keys():
@@ -53,8 +70,11 @@ class StatusControlThread(threading.Thread):
                 f'{[self.now_status]} not have next status[{status}]')
             tool.log_error_screen('transfer_illgal')
             assert(None)
-        ope = tool.Operation(tool.Operation.CLICK, [
-                             next_status_dict[status]['xy']])
+
+        default_dict = {'xy': [0, 0], 'img': ''}
+        recursive_update(default_dict, next_status_dict[status])
+        ope = tool.Operation(default_dict['act_name'], [
+                             default_dict['xy']], default_dict['img'])
         ope.action()
 
         self.exec_delay(status)
@@ -90,6 +110,9 @@ class StatusControlThread(threading.Thread):
                 self.next_status = self.short_path_dict[self.now_status][self.target_status][1]
 
                 self.transfer(self.next_status)
+                continue
+            time.sleep(1)
+            self.search_status()
 
     def stop(self):
         self.thread_close_flag = True
@@ -147,7 +170,7 @@ class StatusControlThread(threading.Thread):
             tool.kick_ass()
             return False
 
-        if tool.retry(check, 4, 1000) == False:
+        if tool.retry(check, 8, 1000) == False:
             logging.error('can not search status')
             tool.log_error_screen('search_status')
             assert(None)
