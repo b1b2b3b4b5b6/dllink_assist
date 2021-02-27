@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-25 20:25:40
-LastEditTime: 2021-02-27 21:27:58
+LastEditTime: 2021-02-27 23:55:46
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\duel.py
@@ -101,6 +101,10 @@ def run_loop(status):
                 break
 
     if status == 'STATUS_PVP_DUEL':
+        tool.Internet().reboot(12)
+        time.sleep(65)
+
+        return None
         while True:
             if get_status() == 'ACTION':
                 call()

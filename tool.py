@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2021-02-27 16:52:30
+LastEditTime: 2021-02-27 22:38:57
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -12,7 +12,7 @@ import numpy
 import cv2 as cv
 import logging
 import time
-
+import subprocess
 
 template = None
 
@@ -154,3 +154,19 @@ def check_lose_connect():
 
 def kick_ass():
     Operation(Operation.CLICK, [[2, 620]]).action()
+
+
+class Internet():
+    def open(self):
+        logging.info('internet open')
+        subprocess.call('NetDisabler_x64.exe /E')
+
+    def close(self):
+        logging.info('internet close')
+        subprocess.call('NetDisabler_x64.exe /D')
+
+    def reboot(self, time_s):
+        logging.info(f'internet will reboot[{time_s}]')
+        self.close()
+        time.sleep(time_s)
+        self.open()

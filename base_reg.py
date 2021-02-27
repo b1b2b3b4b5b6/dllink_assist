@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-23 11:08:45
-LastEditTime: 2021-02-27 17:04:46
+LastEditTime: 2021-02-27 22:40:40
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\base_reg.py
@@ -196,3 +196,25 @@ class STATUS_SERVER_ERROR(STATUS_BASE):
         ]
 
         self.priority = self.PRI_LOW
+
+
+class STATUS_CONNECT_ERROR(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_MAIN': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [269, 542]
+            }
+        }
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = [
+            'img/main/connect_error.png'
+        ]
+
+        self.priority = self.PRI_HIGH
