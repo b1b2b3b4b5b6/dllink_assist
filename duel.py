@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-25 20:25:40
-LastEditTime: 2021-02-26 19:18:36
+LastEditTime: 2021-02-27 21:27:58
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\duel.py
@@ -16,12 +16,12 @@ def get_status():
     tool.capture_screenshot()
     if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_action_turn.png') != None:
         return 'ACTION'
-    if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_battle_turn.png') != None:
-        return 'BATTLE'
+
     if tool.find_img(tool.get_app_screenshot(), 'img/duel/continue_attack.png') != None:
         tool.Operation(tool.Operation.CLICK, [[381, 524]]).action()
         return 'BATTLE'
-
+    if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_battle_turn.png') != None:
+        return 'BATTLE'
     if tool.find_img(tool.get_app_screenshot(), 'img/duel/record.png') != None:
         return 'COMPLETE'
 
@@ -63,7 +63,6 @@ def call():
     time.sleep(2)
     logging.debug('enter battle')
     double_click([510, 630], 1000)
-    time.sleep(1)
 
 
 def battle():
@@ -88,15 +87,28 @@ def battle():
     double_click([510, 630], 800)
 
 
-def loop():
-    logging.info('enter duel mode')
-    while True:
-        if get_status() == 'ACTION':
-            call()
-            continue
-        if get_status() == 'BATTLE':
-            battle()
-            continue
-        if get_status() == 'COMPLETE':
-            break
+def run_loop(status):
+    logging.info(f'enter duel mode[{status}]')
+    if status == 'STATUS_TRANSDOOR_DUEL':
+        while True:
+            if get_status() == 'ACTION':
+                call()
+                continue
+            if get_status() == 'BATTLE':
+                battle()
+                continue
+            if get_status() == 'COMPLETE':
+                break
+
+    if status == 'STATUS_PVP_DUEL':
+        while True:
+            if get_status() == 'ACTION':
+                call()
+                continue
+            if get_status() == 'BATTLE':
+                logging.debug('end turn')
+                double_click([510, 630], 800)
+                continue
+            if get_status() == 'COMPLETE':
+                break
     logging.info('exit duel mode')

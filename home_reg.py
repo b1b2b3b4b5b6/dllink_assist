@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 23:54:10
-LastEditTime: 2021-02-26 23:57:52
+LastEditTime: 2021-02-27 21:15:54
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\detect.py
@@ -56,7 +56,7 @@ class STATUS_MAIN_PVP(STATUS_MAIN):
                 'act_name': tool.Operation.CLICK,
                 'xy': [91, 920]
             },
-            'STATUS_PVP': {
+            'STATUS_PVP_SELECT': {
                 'act_name': tool.Operation.CLICK,
                 'xy': [209, 932]
             }
@@ -136,6 +136,10 @@ class STATUS_TRANSDOOR_10(STATUS_BASE):
             'STATUS_TRANSDOOR_30': {
                 'act_name': tool.Operation.CLICK,
                 'xy': [322, 664]
+            },
+            'STATUS_MAIN': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [46, 934]
             }
         }
         recursive_update(self.transfer_dict, custom_dict)
@@ -210,23 +214,6 @@ class STATUS_TRANSDOOR_DUEL(STATUS_BASE):
             'img/duel/npc_handle_pvp_1.png',
             'img/duel/npc_handle_pvp_2.png',
             'img/duel/select.png'
-        ]
-
-
-class STATUS_DUEL_RESULT(STATUS_BASE):
-    def __init__(self):
-        super().__init__()
-
-        custom_dict = {
-            'STATUS_MAIN': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [265, 913]
-            }
-        }
-        recursive_update(self.transfer_dict, custom_dict)
-
-        self.staimg_list = [
-            'img/duel/duel_result.png'
         ]
 
 
@@ -349,3 +336,142 @@ class STATUS_RECEIVE_INVEST_FROM(STATUS_BASE):
         self.staimg_list = [
             'img/invest/receive_from.png'
         ]
+
+
+class STATUS_PVP_SELECT(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_PVP_PREPARE': {
+                'act_name': tool.Operation.CLICK_ON_IMG,
+                'img': 'img/pvp/click_to_prepare.png'
+            },
+            'STATUS_MAIN_PVP': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [41, 928]
+            }
+        }
+
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = [
+            'img/pvp/select.png'
+        ]
+
+
+class STATUS_PVP_PREPARE(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_PVP_DUEL': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [266, 428]
+            },
+            'STATUS_PVP_SELECT': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [41, 928]
+            }
+        }
+
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = [
+            'img/pvp/prepare.png'
+        ]
+
+
+class STATUS_PVP_DUEL(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_PVP_PREPARE': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [60, 852]
+            }
+        }
+
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = [
+            'img/pvp/duel_1.png',
+            'img/pvp/duel_2.png'
+        ]
+
+
+class STATUS_NICE(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_SEND_NICE': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [59, 863]
+            }
+        }
+
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = [
+            'img/pvp/nice.png'
+        ]
+
+
+class STATUS_SEND_NICE(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_PVP_PREPARE': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [377, 536]
+            }
+        }
+
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = [
+            'img/pvp/send_nice.png'
+        ]
+
+        self.priority = self.PRI_HIGH
+
+
+class STATUS_ANTI_JUMP(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_MAIN': {
+                'act_name': tool.Operation.CLICK,
+                'xy': [164, 651]
+            }
+        }
+
+        recursive_update(self.transfer_dict, custom_dict)
+
+        custom_dict = {}
+        recursive_update(self.handle_dict, custom_dict)
+
+        self.staimg_list = [
+            'img/anti/jump.png'
+        ]
+
+        self.priority = self.PRI_HIGH
