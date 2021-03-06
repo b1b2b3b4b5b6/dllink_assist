@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2021-03-07 02:44:55
+LastEditTime: 2021-03-07 04:28:43
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -57,7 +57,12 @@ def capture_screenshot():
     return source
 
 
-def get_app_screenshot():
+def get_screenshot():
+    global source
+    return source
+
+
+def get_appshot():
     global source
     return source[base_point[1]:(base_point[1] + 960), base_point[0]:(base_point[0] + 540)]
 
@@ -95,10 +100,12 @@ class Operation:
             base_point = get_left_lower_point(xy)
             logging.info(f'base point is {base_point}')
 
-    def click(self, xy):
+    def click(self, xy, bg='app'):
         global base_point
-        pyautogui.moveTo(*xy, 0)
-        pymouse.PyMouse().click(*map(sum, zip(xy, base_point)), 1)
+        if bg == 'app':
+            pymouse.PyMouse().click(*map(sum, zip(xy, base_point)), 1)
+        else:
+            pymouse.PyMouse().click(*xy, 1)
 
     def slide(self, xy_start, xy_stop):
         pymouse.PyMouse().press(*map(sum, zip(xy_start, base_point)))
@@ -111,7 +118,7 @@ class Operation:
                 f'Operation[{self.ope_name}][{self.act_name}][{self.cv_res}][{self.img}] illgal')
             assert(None)
 
-    def action(self):
+    def action(self, bg='app'):
         if self.act_name == self.CLICK:
             self.check_point(self.cv_res[0])
             self.click(self.cv_res[0])
@@ -121,11 +128,19 @@ class Operation:
                 self.check_point(None)
             self.slide(self.cv_res[0], self.cv_res[1])
         elif self.act_name == self.CLICK_ON_IMG:
-            res = find_img(get_app_screenshot(), self.img)
-            if None == res:
-                logging.error(f'can not action click on img[{self.img}]')
+            if bg == 'app':
+                res = find_img(get_appshot(), self.img)
+                if None == res:
+                    logging.error(f'can not action click on img[{self.img}]')
+                else:
+                    self.click(get_center_point(res), bg)
             else:
-                self.click(get_center_point(res))
+                res = find_img(get_screenshot(), self.img)
+                if None == res:
+                    logging.error(f'can not action click on img[{self.img}]')
+                else:
+                    self.click(get_center_point(res), bg)
+
         else:
             self.check_point(None)
 
@@ -149,7 +164,7 @@ def log_error_screen(name):
 
 
 def check_lose_connect():
-    if find_img(get_app_screenshot(), 'img/base/loss_connect.png') != None:
+    if find_img(get_appshot(), 'img/base/loss_connect.png') != None:
         return True
     else:
         return False
@@ -178,11 +193,13 @@ class Internet():
 class SwitchApp():
     def game(self):
         logging.info('switch to game')
-        Operation(Operation.CLICK, [[251, -17]]).action()
+        Operation(Operation.CLICK_ON_IMG,
+                  img='img/base/game_ico.png').action('screen')
 
     def home(self):
         logging.info('switch to home')
-        Operation(Operation.CLICK, [[64, -12]]).action()
+        Operation(Operation.CLICK_ON_IMG,
+                  img='img/base/head.png').action('screen')
 
 
 def get_all_modules(dir_name):

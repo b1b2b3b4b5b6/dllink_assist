@@ -15,15 +15,15 @@ import cv2 as cv
 
 def get_status():
     tool.capture_screenshot()
-    if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_action_turn.png') != None:
+    if tool.find_img(tool.get_appshot(), 'img/duel/your_action_turn.png') != None:
         return 'ACTION'
 
-    if tool.find_img(tool.get_app_screenshot(), 'img/duel/continue_attack.png') != None:
+    if tool.find_img(tool.get_appshot(), 'img/duel/continue_attack.png') != None:
         tool.Operation(tool.Operation.CLICK, [[381, 524]]).action()
         return 'BATTLE'
-    if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_battle_turn.png') != None:
+    if tool.find_img(tool.get_appshot(), 'img/duel/your_battle_turn.png') != None:
         return 'BATTLE'
-    if tool.find_img(tool.get_app_screenshot(), 'img/base/ok.png') != None:
+    if tool.find_img(tool.get_appshot(), 'img/base/ok.png') != None:
         return 'COMPLETE'
 
     if tool.check_lose_connect() == True:

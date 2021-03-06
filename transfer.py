@@ -157,7 +157,7 @@ class StatusControlThread(threading.Thread):
 
         res = True
         for img in cs.staimg_list['yes']:
-            xy = tool.find_img(tool.get_app_screenshot(), self.img_dict[img])
+            xy = tool.find_img(tool.get_appshot(), self.img_dict[img])
             if xy == None:
                 logging.debug(
                     f'expect status[{expect_status}] can not find img[{img}]')
@@ -165,7 +165,7 @@ class StatusControlThread(threading.Thread):
                 break
 
         for img in cs.staimg_list['no']:
-            xy = tool.find_img(tool.get_app_screenshot(), self.img_dict[img])
+            xy = tool.find_img(tool.get_appshot(), self.img_dict[img])
 
             if xy != None:
                 logging.debug(
