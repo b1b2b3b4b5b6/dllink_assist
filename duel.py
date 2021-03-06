@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-25 20:25:40
-LastEditTime: 2021-02-27 23:55:46
+LastEditTime: 2021-03-07 03:46:02
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\duel.py
@@ -10,6 +10,7 @@ FilePath: \dllink_assist\duel.py
 import tool
 import time
 import logging
+import cv2 as cv
 
 
 def get_status():
@@ -22,7 +23,7 @@ def get_status():
         return 'BATTLE'
     if tool.find_img(tool.get_app_screenshot(), 'img/duel/your_battle_turn.png') != None:
         return 'BATTLE'
-    if tool.find_img(tool.get_app_screenshot(), 'img/duel/record.png') != None:
+    if tool.find_img(tool.get_app_screenshot(), 'img/base/ok.png') != None:
         return 'COMPLETE'
 
     if tool.check_lose_connect() == True:
@@ -89,7 +90,7 @@ def battle():
 
 def run_loop(status):
     logging.info(f'enter duel mode[{status}]')
-    if status == 'STATUS_TRANSDOOR_DUEL':
+    if status == 'STATUS_GATE_DUEL':
         while True:
             if get_status() == 'ACTION':
                 call()
@@ -101,18 +102,11 @@ def run_loop(status):
                 break
 
     if status == 'STATUS_PVP_DUEL':
-        tool.Internet().reboot(12)
-        time.sleep(65)
-
+        tool.SwitchApp().home()
+        time.sleep(40)
+        tool.SwitchApp().game()
+        time.sleep(5)
+        tool.Operation(tool.Operation.CLICK, [[220, 499]]).action()
         return None
-        while True:
-            if get_status() == 'ACTION':
-                call()
-                continue
-            if get_status() == 'BATTLE':
-                logging.debug('end turn')
-                double_click([510, 630], 800)
-                continue
-            if get_status() == 'COMPLETE':
-                break
+
     logging.info('exit duel mode')

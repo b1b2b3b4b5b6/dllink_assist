@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 01:11:28
-LastEditTime: 2021-02-28 00:25:57
+LastEditTime: 2021-03-07 02:13:56
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\main.py
@@ -9,7 +9,6 @@ FilePath: \挂机\main.py
 import pyautogui
 import logging
 import tool
-import home_reg
 import time
 import transfer
 import schedule
@@ -25,7 +24,9 @@ def pvp(control):
 
 def npc(control):
     logging.info('do npc start')
-    control.goto_status('STATUS_MAIN', 0)
+    control.goto_status('STATUS_GATE_SEL', 0)
+    tool.Operation(tool.Operation.CLICK, [[269, 573]]).action()
+    time.sleep(0.1)
     tool.Operation(tool.Operation.CLICK, [[269, 590]]).action()
     time.sleep(0.1)
     tool.Operation(tool.Operation.CLICK, [[269, 610]]).action()
@@ -47,23 +48,20 @@ def npc(control):
     time.sleep(0.1)
     tool.Operation(tool.Operation.CLICK, [[338, 590]]).action()
     time.sleep(0.1)
+    tool.Operation(tool.Operation.CLICK, [[209, 674]]).action()
+    time.sleep(0.1)
 
-    control.goto_status('STATUS_MAIN_PVP', 0)
+    control.goto_status('STATUS_PVP_SEL', 0)
     tool.Operation(tool.Operation.CLICK, [[270, 553]]).action()
     time.sleep(0.1)
     tool.Operation(tool.Operation.CLICK, [[269, 609]]).action()
     time.sleep(0.1)
     tool.Operation(tool.Operation.CLICK, [[339, 600]]).action()
     time.sleep(0.1)
+    tool.Operation(tool.Operation.CLICK, [[287, 524]]).action()
+    time.sleep(0.1)
 
-    control.goto_status('STATUS_MAIN_STORE', 0)
-    tool.Operation(tool.Operation.CLICK, [[270, 663]]).action()
-    time.sleep(0.1)
-    tool.Operation(tool.Operation.CLICK, [[270, 762]]).action()
-    time.sleep(0.1)
-    tool.Operation(tool.Operation.CLICK, [[270, 591]]).action()
-    time.sleep(0.1)
-    control.goto_status('STATUS_MAIN', 0)
+    control.goto_status('STATUS_GATE_SEL', 0)
     logging.info('do npc stop')
 
 

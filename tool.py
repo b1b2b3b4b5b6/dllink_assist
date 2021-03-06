@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2021-02-27 22:38:57
+LastEditTime: 2021-03-07 02:44:55
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -13,12 +13,15 @@ import cv2 as cv
 import logging
 import time
 import subprocess
+import os
 
 template = None
 
 
-def find_img(background, target, similarity=0.95):
-    template = cv.imread(target)
+def find_img(background, template, similarity=0.95):
+    if isinstance(template, str):
+        template = cv.imread(template)
+
     result = cv.matchTemplate(background, template, cv.TM_CCOEFF_NORMED)
     start_point = cv.minMaxLoc(result)[3]
     end_point = [start_point[0] + template.shape[1],
@@ -84,7 +87,7 @@ class Operation:
 
     def reset_base_point(self):
         global base_point
-        xy = find_img(capture_screenshot(), 'img/main/head.png')
+        xy = find_img(capture_screenshot(), 'img/base/head.png')
         if xy == None:
             logging.error('can not find base_point')
             assert(None)
@@ -146,7 +149,7 @@ def log_error_screen(name):
 
 
 def check_lose_connect():
-    if find_img(get_app_screenshot(), 'img/main/loss_connect.png') != None:
+    if find_img(get_app_screenshot(), 'img/base/loss_connect.png') != None:
         return True
     else:
         return False
@@ -170,3 +173,26 @@ class Internet():
         self.close()
         time.sleep(time_s)
         self.open()
+
+
+class SwitchApp():
+    def game(self):
+        logging.info('switch to game')
+        Operation(Operation.CLICK, [[251, -17]]).action()
+
+    def home(self):
+        logging.info('switch to home')
+        Operation(Operation.CLICK, [[64, -12]]).action()
+
+
+def get_all_modules(dir_name):
+    modules = []
+    for root, _, fs in os.walk(dir_name):
+        for f in fs:
+            if f.startswith('__') or f.endswith('.pyc'):
+                continue
+            fullname = os.path.join(root, f)
+            fullname = fullname.replace('.py', '')
+            fullname = fullname.replace('\\', '.')
+            modules.append(fullname)
+    return modules

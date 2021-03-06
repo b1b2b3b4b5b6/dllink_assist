@@ -1,20 +1,16 @@
 '''
 Author: your name
 Date: 2021-02-24 06:17:11
-LastEditTime: 2021-02-27 16:50:46
+LastEditTime: 2021-03-07 03:48:52
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\transfer.py
 '''
 
 
-import base_reg
 import inspect
 import tool
 import sys
-import home_reg
-import duel
-import base_reg
 import networkx as nx
 import matplotlib.pyplot as plt
 import logging
@@ -22,18 +18,21 @@ import threading
 import time
 from dict_recursive_update import recursive_update
 import collections
-reg_list = ['base_reg', 'home_reg']
+import cv2 as cv
+import importlib
+import duel
+from pathlib import Path
 
 delay_dict = {
-    'STATUS_TRANSDOOR_DUEL': 16000,
+    'STATUS_GATE_DUEL': 16000,
     'STATUS_PVP_DUEL': 20000,
     "STATUS_NPC_DUEL_AUTO": 10000,
-    'STATUS_PVP_SELECT': 2000,
+    'STATUS_PVP_HOME': 2000,
     'STATUS_PVP_PREPARE': 2000,
     'STATUS_SEND_NICE': 1000
 }
 
-duel_list = ['STATUS_PVP_DUEL', 'STATUS_TRANSDOOR_DUEL']
+duel_list = ['STATUS_PVP_DUEL', 'STATUS_GATE_DUEL']
 
 
 class StatusControlThread(threading.Thread):
@@ -45,15 +44,24 @@ class StatusControlThread(threading.Thread):
     G = nx.DiGraph()
     short_path_dict = {}
     thread_close_flag = False
+    img_dict = {}
 
     def __init__(self):
         super().__init__()
         tool.Operation()
-        for mn in reg_list:
+
+        for mn in tool.get_all_modules('status'):
+            importlib.import_module(mn)
             for name, class_ in inspect.getmembers(sys.modules[mn], inspect.isclass):
                 self.status_dict[name] = class_()
                 for k, _ in self.status_dict[name].transfer_dict.items():
                     self.G.add_edge(name, k)
+                for img in (self.status_dict[name].staimg_list['yes'] + self.status_dict[name].staimg_list['no']):
+                    if False == Path(img).exists():
+                        logging.error(f'[{img}] not exist')
+                        assert(None)
+                    self.img_dict[img] = cv.imread(img)
+
         self.status_dict.pop('STATUS_BASE')
         z = list(zip(self.status_dict.keys(), self.status_dict.values()))
         z = sorted(z, key=lambda x: x[1].priority, reverse=True)
@@ -108,7 +116,7 @@ class StatusControlThread(threading.Thread):
             if self.thread_close_flag:
                 exit()
             if self.target_status == 'STATUS_BASE':
-                time.sleep(0.2)
+                time.sleep(0.5)
                 continue
 
             self.search_status(refresh=True)
@@ -146,16 +154,25 @@ class StatusControlThread(threading.Thread):
         if refresh == True:
             tool.capture_screenshot()
         cs = self.status_dict[expect_status]
-        staimg_list = cs.staimg_list
-        res = True
-        for img in staimg_list:
-            xy = tool.find_img(tool.get_app_screenshot(), img)
 
+        res = True
+        for img in cs.staimg_list['yes']:
+            xy = tool.find_img(tool.get_app_screenshot(), self.img_dict[img])
             if xy == None:
                 logging.debug(
                     f'expect status[{expect_status}] can not find img[{img}]')
                 res = False
                 break
+
+        for img in cs.staimg_list['no']:
+            xy = tool.find_img(tool.get_app_screenshot(), self.img_dict[img])
+
+            if xy != None:
+                logging.debug(
+                    f'expect status[{expect_status}] find illgal img[{img}]')
+                res = False
+                break
+
         return res
 
     def search_status(self, refresh=True):
@@ -172,7 +189,7 @@ class StatusControlThread(threading.Thread):
             tool.kick_ass()
             return False
 
-        if tool.retry(check, 10, 1000) == False:
+        if tool.retry(check, 60, 1000) == False:
             logging.error('can not search status')
             tool.log_error_screen('search_status')
             assert(None)
