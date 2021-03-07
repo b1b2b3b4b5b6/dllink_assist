@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-23 11:08:45
-LastEditTime: 2021-03-07 02:52:44
+LastEditTime: 2021-03-07 13:20:57
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\base_reg.py
@@ -32,7 +32,7 @@ class STATUS_LOSS_CONNECT(STATUS_BASE):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE': {
+            'STATUS_GATE_SEL': {
                 'act_name': tool.Operation.CLICK,
                 'xy': [380, 536]
             }
