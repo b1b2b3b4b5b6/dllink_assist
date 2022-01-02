@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-24 06:17:11
-LastEditTime: 2021-03-07 03:48:52
+LastEditTime: 2022-01-03 01:58:20
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\transfer.py
@@ -9,6 +9,10 @@ FilePath: \dllink_assist\transfer.py
 
 
 import inspect
+
+from networkx.readwrite.json_graph import tree
+from win32con import CB_INITSTORAGE
+from status.base_reg import STATUS_BASE
 import tool
 import sys
 import networkx as nx
@@ -23,15 +27,6 @@ import importlib
 import duel
 from pathlib import Path
 
-delay_dict = {
-    'STATUS_GATE_DUEL': 16000,
-    'STATUS_PVP_DUEL': 20000,
-    "STATUS_NPC_DUEL_AUTO": 10000,
-    'STATUS_PVP_HOME': 2000,
-    'STATUS_PVP_PREPARE': 2000,
-    'STATUS_SEND_NICE': 1000
-}
-
 duel_list = ['STATUS_PVP_DUEL', 'STATUS_GATE_DUEL']
 
 
@@ -43,12 +38,13 @@ class StatusControlThread(threading.Thread):
     status_dict = d1 = collections.OrderedDict()
     G = nx.DiGraph()
     short_path_dict = {}
-    thread_close_flag = False
-    img_dict = {}
+    thread_status = 'run'
+    # last_ms_stamp = 0
+    last_success_ms_stamp = float('INF')
+    search_status_retry = 0
 
     def __init__(self):
         super().__init__()
-        tool.Operation()
 
         for mn in tool.get_all_modules('status'):
             importlib.import_module(mn)
@@ -56,11 +52,6 @@ class StatusControlThread(threading.Thread):
                 self.status_dict[name] = class_()
                 for k, _ in self.status_dict[name].transfer_dict.items():
                     self.G.add_edge(name, k)
-                for img in (self.status_dict[name].staimg_list['yes'] + self.status_dict[name].staimg_list['no']):
-                    if False == Path(img).exists():
-                        logging.error(f'[{img}] not exist')
-                        assert(None)
-                    self.img_dict[img] = cv.imread(img)
 
         self.status_dict.pop('STATUS_BASE')
         z = list(zip(self.status_dict.keys(), self.status_dict.values()))
@@ -68,65 +59,76 @@ class StatusControlThread(threading.Thread):
         self.status_dict = dict(z)
 
         self.short_path_dict = dict(nx.all_pairs_shortest_path(self.G))
-        self.search_status()
+        # 初始时打印状态转移图
+        # self.show_map()
 
     def __str__(self):
         return f'now[{self.now_status}] next[{self.next_status}] target[{self.target_status}]'
 
-    def goto_status(self, status, delay_s=180):
-        logging.info(f'start go to status[{status}] ')
+    def wait_for_status(self, status, delay_s=0):
+        logging.info(f'wait fo status[{status}]')
         if self.now_status == status:
             return True
-        self.set_target_status(status)
+
+        m_delay = delay_s
         if delay_s == 0:
             while self.now_status != status:
                 time.sleep(1)
         else:
-            while delay_s >= 0 and self.now_status != status:
+            while m_delay > 0 and self.now_status != status:
                 time.sleep(1)
-                delay_s -= 1
+                m_delay -= 1
+
         if self.now_status == status:
-            logging.info(f'start go to status[{status}] success')
             return True
         else:
-            logging.warn(f'start go to status[{status}] fail')
             return False
 
-    def exec_delay(self, status):
-        if status in delay_dict.keys():
-            logging.info(f'exec [{status}] delay[{delay_dict[status]}]')
-            time.sleep(delay_dict[status] / 1000)
+    def goto_status(self, status, delay_s=0):
+        logging.info(f'start go to status[{status}]')
+        self.set_target_status(status)
+
+        if self.wait_for_status(status, delay_s):
+            logging.info(f'go to status[{status}] success')
+            return True
         else:
-            time.sleep(1000 / 1000)
+            logging.warn(f'go to status[{status}] fail')
+            return False
 
-    def transfer(self, status, delay_ms=500):
+    def transfer(self, status):
         next_status_dict = self.status_dict[self.now_status].transfer_dict
-
-        default_dict = {'xy': [0, 0], 'img': ''}
-        recursive_update(default_dict, next_status_dict[status])
-        ope = tool.Operation(default_dict['act_name'], [
-            default_dict['xy']], default_dict['img'])
-        ope.action()
-
-        self.exec_delay(status)
+        ope = next_status_dict[status]
+        if isinstance(ope, list) == True:
+            ope_list = ope
+            for ope in ope_list:
+                if ope != None:
+                    ope.action()
+        else:
+            if ope != None:
+                ope.action()
 
     def run(self):  # 必须有的函数
         self.thread_close_flag = False
         while True:
-            if self.thread_close_flag:
+            time.sleep(0.05)
+
+            if self.thread_status == 'run':
+                pass
+            elif self.thread_status == 'stop':
                 exit()
+            elif self.thread_status == 'pause':
+                continue
+
+            # now_stamp = (int(round(time.time() * 1000)))
+            # if now_stamp - self.last_ms_stamp > 500:
+            #     self.last_ms_stamp = now_stamp
+            # else:
+            #     continue
+
+            if self.search_status() == False:
+                continue
+
             if self.target_status == 'STATUS_BASE':
-                time.sleep(0.5)
-                continue
-
-            self.search_status(refresh=True)
-
-            if self.now_status == 'STATUS_BASE':
-                continue
-
-            if self.now_status in duel_list:
-                duel.run_loop(self.now_status)
-                self.now_status = 'STATUS_BASE'
                 continue
 
             if self.now_status != self.target_status:
@@ -138,10 +140,6 @@ class StatusControlThread(threading.Thread):
                 self.transfer(self.next_status)
                 continue
 
-    def stop(self):
-        self.thread_close_flag = True
-        self.join()
-
     def show_map(self):
         for k, v in self.short_path_dict.items():
             print(k)
@@ -150,52 +148,63 @@ class StatusControlThread(threading.Thread):
                 node_color='g', node_size=1000)
         plt.show()
 
-    def check_status(self, expect_status, refresh=True):
-        if refresh == True:
-            tool.capture_screenshot()
+    def check_status(self, expect_status):
+
         cs = self.status_dict[expect_status]
 
         res = True
-        for img in cs.staimg_list['yes']:
-            xy = tool.find_img(tool.get_appshot(), self.img_dict[img])
-            if xy == None:
-                logging.debug(
-                    f'expect status[{expect_status}] can not find img[{img}]')
+        for p in cs.staimg_list:
+            if p.get_result() == False:
                 res = False
                 break
-
-        for img in cs.staimg_list['no']:
-            xy = tool.find_img(tool.get_appshot(), self.img_dict[img])
-
-            if xy != None:
-                logging.debug(
-                    f'expect status[{expect_status}] find illgal img[{img}]')
-                res = False
-                break
-
+        if len(cs.staimg_list) == 0:
+            res = False
         return res
 
-    def search_status(self, refresh=True):
+    def search_status(self):
 
         def check():
-            if refresh == True:
-                tool.capture_screenshot()
-            self.now_status = 'STATUS_BASE'
-
+            self.search_status_retry += 1
+            tool.g_resource.refresh_screenshot()
             for s in self.status_dict.keys():
-                if self.check_status(s, False) == True:
+                if self.check_status(s) == True:
                     self.now_status = s
                     return True
+
+            self.now_status = 'STATUS_BASE'
             tool.kick_ass()
             return False
 
-        if tool.retry(check, 60, 1000) == False:
-            logging.error('can not search status')
-            tool.log_error_screen('search_status')
-            assert(None)
+        if check() == True:
+            self.reset_kick_all()
+            logging.debug(f'search status finished, {self}')
+            return True
+        else:
+            self.handle_kick_all()
             return False
-        logging.info(f'search status finished, {self}')
-        return True
+
+    def handle_kick_all(self):
+        now_ms_stamp = (int(round(time.time() * 1000)))
+        if now_ms_stamp - self.last_success_ms_stamp > 30*1000 and self.search_status_retry > 30:
+            self.reset_kick_all()
+            tool.push_cloud('search_status_error, use kick all')
+            tool.kick_all()
+            return True
+        else:
+            return False
+
+    def reset_kick_all(self):
+        now_ms_stamp = (int(round(time.time() * 1000)))
+        self.last_success_ms_stamp = now_ms_stamp
+        self.search_status_retry = 0
 
     def set_target_status(self, expect_status):
         self.target_status = expect_status
+        logging.info(f'set target[{expect_status}]')
+
+    def set_thread_status(self, status):
+        logging.info(f'set thread status[{status}]')
+        self.last_success_ms_stamp = (int(round(time.time() * 1000)))
+        self.thread_status = status
+        if status == 'stop':
+            self.join()

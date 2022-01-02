@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-23 11:08:45
-LastEditTime: 2021-03-07 13:20:57
+LastEditTime: 2022-01-03 00:43:35
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\base_reg.py
@@ -20,58 +20,23 @@ class STATUS_BASE:
     def __init__(self):
         self.priority = self.PRI_MID
         self.transfer_dict = {}
-        self.handle_dict = {}
-        self.staimg_list = {
-            'yes': [],
-            'no': []
-        }
+        self.staimg_list = []
 
 
-class STATUS_LOSS_CONNECT(STATUS_BASE):
+class STATUS_SKIP(STATUS_BASE):
     def __init__(self):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [380, 536]
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/skip.png')
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
+        self.staimg_list = [
+            tool.ProofImg('img/base/skip.png')
+        ]
 
-        self.staimg_list = {
-            'yes': ['img/base/loss_connect.png'],
-            'no': []
-        }
-
-        self.priority = self.PRI_TOP
-
-
-class STATUS_DAILY_INFO(STATUS_BASE):
-    def __init__(self):
-        super().__init__()
-
-        custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [508, 676]
-            }
-        }
-        recursive_update(self.transfer_dict, custom_dict)
-
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
-
-        self.staimg_list = {
-            'yes': ['img/base/skip.png'],
-            'no': []
-
-        }
-
-        self.priority = self.PRI_TOP
+        self.priority = self.PRI_HIGH
 
 
 class STATUS_START_GAME(STATUS_BASE):
@@ -79,23 +44,15 @@ class STATUS_START_GAME(STATUS_BASE):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [264, 596]
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/start_game.png')
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
+        self.staimg_list = [
+            tool.ProofImg('img/base/start_game.png')
+        ]
 
-        self.staimg_list = {
-            'yes': ['img/base/start_game.png'],
-            'no': []
-
-        }
-
-        self.priority = self.PRI_TOP
+        self.priority = self.PRI_HIGH
 
 
 class STATUS_REPORT(STATUS_BASE):
@@ -103,47 +60,47 @@ class STATUS_REPORT(STATUS_BASE):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [44, 930]
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/report.png')
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
-
-        self.staimg_list = {
-            'yes': ['img/base/report.png'],
-            'no': []
-
-        }
+        self.staimg_list = [
+            tool.ProofImg('img/base/report.png')
+        ]
 
         self.priority = self.PRI_HIGH
 
 
-class STATUS_GOOD(STATUS_BASE):
+class STATUS_OK(STATUS_BASE):
     def __init__(self):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK_ON_IMG,
-                'img': 'img/base/ok.png'
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/ok.png')
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
+        self.staimg_list = [
+            tool.ProofImg('img/base/ok.png')
+        ]
 
-        self.staimg_list = {
-            'yes': ['img/base/ok.png'],
-            'no': []
+        self.priority = self.PRI_HIGH
 
+
+class STATUS_CONFIRM(STATUS_BASE):
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/confirm.png')
         }
+        recursive_update(self.transfer_dict, custom_dict)
 
-        self.priority = self.PRI_TOP
+        self.staimg_list = [
+            tool.ProofImg('img/base/confirm.png')
+        ]
+
+        self.priority = self.PRI_HIGH
 
 
 class STATUS_NEXT(STATUS_BASE):
@@ -151,21 +108,13 @@ class STATUS_NEXT(STATUS_BASE):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK_ON_IMG,
-                'img': 'img/base/next_step.png'
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/next_step.png')
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
-
-        self.staimg_list = {
-            'yes': ['img/base/next_step.png'],
-            'no': []
-
-        }
+        self.staimg_list = [
+            tool.ProofImg('img/base/next_step.png')
+        ]
 
         self.priority = self.PRI_HIGH
 
@@ -175,68 +124,28 @@ class STATUS_CLOSE(STATUS_BASE):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK_ON_IMG,
-                'img': 'img/base/close.png'
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/close.png')
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
+        self.staimg_list = [
+            tool.ProofImg('img/base/close.png')
+        ]
 
-        self.staimg_list = {
-            'yes': ['img/base/close.png'],
-            'no': []
-
-        }
-
-        self.priority = self.PRI_LOW
+        self.priority = self.PRI_HIGH
 
 
-class STATUS_SERVER_ERROR(STATUS_BASE):
+class STATUS_RETRY_CONNECT(STATUS_BASE):
     def __init__(self):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [269, 542]
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/retry_connect.png')
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
-
-        self.staimg_list = {
-            'yes': ['img/base/server_error.png'],
-            'no': []
-
-        }
-
-        self.priority = self.PRI_TOP
-
-
-class STATUS_CONNECT_ERROR(STATUS_BASE):
-    def __init__(self):
-        super().__init__()
-
-        custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [269, 542]
-            }
-        }
-        recursive_update(self.transfer_dict, custom_dict)
-
-        custom_dict = {}
-        recursive_update(self.handle_dict, custom_dict)
-
-        self.staimg_list = {
-            'yes': ['img/base/connect_error.png'],
-            'no': []
-
-        }
+        self.staimg_list = [
+            tool.ProofImg('img/base/retry_connect.png')
+        ]
 
         self.priority = self.PRI_TOP

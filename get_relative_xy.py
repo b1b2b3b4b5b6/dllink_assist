@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-24 15:28:57
-LastEditTime: 2021-02-24 15:33:12
+LastEditTime: 2022-01-02 22:13:23
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\get_xy.py
@@ -10,8 +10,13 @@ import os
 import time
 import tool
 import pyautogui as pag
+import logging
 
-ope = tool.Operation()
+logging.basicConfig(level=logging.DEBUG,
+                    format='[%(asctime)s][%(levelname)s]%(filename)s[%(lineno)d]:  %(message)s', datefmt='%d/%b/%Y %H:%M:%S')
+
+time.sleep(2)
+
 
 try:
     while True:
@@ -19,7 +24,11 @@ try:
         # pag.position()返回鼠标的坐标
         x, y = pag.position()
 
-        print(f'[{x- tool.base_point[0] }, {y- tool.base_point[1]}]')
+        print([x, y])
+        print(
+            f'[{[x - tool.g_resource.get_window_base_point()[0],y - tool.g_resource.get_window_base_point()[1]]}]')
+        print(
+            f'[{[x - tool.g_resource.get_base_point()[0],y - tool.g_resource.get_base_point()[1]]}]')
         time.sleep(0.1)
         # 清除屏幕
         os.system('cls')

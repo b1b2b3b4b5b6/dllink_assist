@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-04 22:00:37
-LastEditTime: 2021-03-07 03:27:09
+LastEditTime: 2022-01-03 00:45:41
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\status\home\store.py
@@ -19,27 +19,28 @@ class STATUS_STORE_SEL(STATUS_BASE):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [91, 920]
-            },
-            'STATUS_PVP_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [209, 932]
-            },
-            'STATUS_STORE': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [336, 930]
-            },
-            'STATUS_WORK_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [452, 926]
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/home/gate/not_sel.png', True),
+            'STATUS_PVP_SEL': tool.OperationClickOnImg('img/home/pvp/not_sel.png', True),
+            'STATUS_STORE': tool.OperationClickOnImg('img/home/store/not_sel.png', True),
+            'STATUS_WORK_SEL': tool.OperationClickOnImg('img/home/work/not_sel.png', True),
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        self.staimg_list = {
-            'yes': ['img/home/store/sel.png'],
-            'no': []
+        self.staimg_list = [
+            tool.ProofImg('img/home/store/sel.png'),
+        ]
 
+
+class STATUS_STORE(STATUS_BASE):
+
+    def __init__(self):
+        super().__init__()
+
+        custom_dict = {
+            'STATUS_STORE_SEL': tool.OperationClickOnImg('img/base/back.png')
         }
+        recursive_update(self.transfer_dict, custom_dict)
+
+        self.staimg_list = [
+            tool.ProofImg('img/home/store/in.png'),
+        ]

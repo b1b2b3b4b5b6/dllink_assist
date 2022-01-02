@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-04 22:01:15
-LastEditTime: 2021-03-07 03:27:47
+LastEditTime: 2022-01-03 00:45:52
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\status\home\work.py
@@ -19,27 +19,13 @@ class STATUS_WORK_SEL(STATUS_BASE):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [91, 920]
-            },
-            'STATUS_PVP_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [209, 932]
-            },
-            'STATUS_STORE_SEL': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [336, 930]
-            },
-            'STATUS_WORK': {
-                'act_name': tool.Operation.CLICK,
-                'xy': [452, 926]
-            }
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/home/gate/not_sel.png', True),
+            'STATUS_PVP_SEL': tool.OperationClickOnImg('img/home/pvp/not_sel.png', True),
+            'STATUS_STORE_SEL': tool.OperationClickOnImg('img/home/store/not_sel.png', True),
+            # 'STATUS_WORK_SEL': tool.OperationClickOnImg('img/home/work/not_sel.png',True),
         }
         recursive_update(self.transfer_dict, custom_dict)
 
-        self.staimg_list = {
-            'yes': ['img/home/work/sel.png'],
-            'no': []
-
-        }
+        self.staimg_list = [
+            tool.ProofImg('img/home/work/sel.png'),
+        ]
