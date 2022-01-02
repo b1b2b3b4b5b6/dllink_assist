@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-23 11:08:45
-LastEditTime: 2022-01-03 00:43:35
+LastEditTime: 2022-01-03 04:38:17
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\base_reg.py
@@ -60,7 +60,7 @@ class STATUS_REPORT(STATUS_BASE):
         super().__init__()
 
         custom_dict = {
-            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/report.png')
+            'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/back.png')
         }
         recursive_update(self.transfer_dict, custom_dict)
 

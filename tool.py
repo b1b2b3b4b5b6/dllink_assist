@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2022-01-03 02:17:05
+LastEditTime: 2022-01-03 04:44:27
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -174,6 +174,9 @@ g_resource: Resource = None
 
 def init():
     global g_resource
+    logging.info('please put game windows top')
+    time.sleep(3)
+
     g_resource = Resource(EnvInfo('pc'))
 
 
@@ -370,8 +373,13 @@ def kick_all():
 
 
 def push_cloud(msg):
-    requests.get(
-        f'{msg}')
+    url_prefix = g_resource.env_info.ft_url_prefix
+    if url_prefix != None:
+        url = url_prefix + msg
+        try:
+            requests.get(url)
+        except BaseException:
+            logging.error(f'push cloud faild[{url}]')
 
 
 def get_all_modules(dir_name):
