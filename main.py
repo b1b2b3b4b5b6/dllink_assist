@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 01:11:28
-LastEditTime: 2022-01-05 21:45:50
+LastEditTime: 2022-01-05 21:51:30
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\main.py
@@ -77,7 +77,7 @@ t = transfer.StatusControlThread()
 t.start()
 
 schedule.every(20).minutes.do(npc, t)
-schedule.every(3).seconds.do(pvp, t)
+# schedule.every(3).seconds.do(pvp, t)
 schedule.run_all()
 
 try:
