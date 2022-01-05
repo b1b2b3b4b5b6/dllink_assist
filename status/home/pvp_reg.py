@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-04 21:33:52
-LastEditTime: 2022-01-03 01:52:50
+LastEditTime: 2022-01-05 21:45:00
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \dllink_assist\pvp_reg.py
@@ -40,13 +40,12 @@ class STATUS_PVP(STATUS_BASE):
 
         custom_dict = {
             'STATUS_GATE_SEL': tool.OperationClickOnImg('img/base/back.png', is_cache=True),
-            'STATUS_PVP_PREPARE': tool.OperationClickOnImg('img/home/pvp/prepare.png', is_cache=True),
+            'STATUS_PVP_PREPARE': tool.OperationClickOnImg('img/home/pvp/sort.png', is_cache=True),
         }
         recursive_update(self.transfer_dict, custom_dict)
 
         self.staimg_list = [
-            tool.ProofImg('img/home/pvp/prepare.png'),
-            tool.ProofImg('img/home/pvp/normal_duel.png', typ='not_exist')
+            tool.ProofImg('img/home/pvp/hall.png'),
         ]
 
 
@@ -62,8 +61,7 @@ class STATUS_PVP_PREPARE(STATUS_BASE):
         recursive_update(self.transfer_dict, custom_dict)
 
         self.staimg_list = [
-            tool.ProofImg('img/home/pvp/prepare.png'),
-            tool.ProofImg('img/home/pvp/normal_duel.png'),
+            tool.ProofImg('img/home/pvp/record.png'),
         ]
 
 
@@ -88,8 +86,8 @@ class STATUS_PVP_ING(STATUS_BASE):
     def __init__(self):
         super().__init__()
 
-        # 空跳转方式 可以简化状态图
         custom_dict = {
+            # 空跳转方式 指代 游戏会自动转移状态
             'STATUS_PVP_PREPARE': None,
         }
         recursive_update(self.transfer_dict, custom_dict)
