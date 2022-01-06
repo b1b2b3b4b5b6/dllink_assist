@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-02-21 02:27:24
-LastEditTime: 2022-01-03 04:44:27
+LastEditTime: 2022-01-07 03:28:55
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \挂机\findpic.py
@@ -18,6 +18,7 @@ import os
 import threading
 import pathlib
 import requests
+import numpy
 
 
 class ImgHandle():
@@ -62,7 +63,7 @@ class EnvInfo():
     platform = None
     resurce_root = None
     app_img_offset = None
-    app_img_xy = None
+    app_img_wh = None
     ft_url_prefix = None
 
     def __init__(self, platform):
@@ -73,7 +74,7 @@ class EnvInfo():
         self.platform = conf['platform']
         self.resurce_root = self.platform + '/'
         self.app_img_offset = conf['app_img_offset']
-        self.app_img_xy = conf['app_img_xy']
+        self.app_img_wh = conf['app_img_wh']
         self.ft_url_prefix = conf['ft_url_prefix']
 
         if platform not in self.allow_platform:
@@ -83,7 +84,7 @@ class EnvInfo():
         logging.info(f'{self}')
 
     def __str__(self) -> str:
-        return f'platform[{self.platform}] resurce_root[{self.resurce_root}] app_img_offset[{self.app_img_offset} app_img_xy[{self.app_img_xy} ft_url[{self.ft_url_prefix}]]'.strip()
+        return f'platform[{self.platform}] resurce_root[{self.resurce_root}] app_img_offset[{self.app_img_offset} app_img_xy[{self.app_img_wh} ft_url[{self.ft_url_prefix}]]'.strip()
 
     def get_path_by_key(self, key):
         return pathlib.PurePosixPath(
@@ -127,8 +128,8 @@ class Resource():
     def refresh_screenshot(self):
         self.screenshot_lock.acquire()
         img = pyautogui.screenshot()  # x,y,w,h
-        img.save('screenshot.png')
-        self.screenshot = cv.imread('screenshot.png')
+
+        self.screenshot = cv.cvtColor(numpy.array(img), cv.COLOR_RGB2BGR)
         self.screenshot_lock.release()
 
     def get_screenshot(self, refresh=False):
@@ -141,8 +142,8 @@ class Resource():
         if refresh == True:
             self.refresh_screenshot()
 
-        return self.screenshot[self.get_base_point()[1]:(self.get_base_point()[1] + self.env_info.app_img_xy[1]),
-                               self.get_base_point()[0]:(self.get_base_point()[0] + self.env_info.app_img_xy[0])]
+        return self.screenshot[self.get_base_point()[1]:(self.get_base_point()[1] + self.env_info.app_img_wh[1]),
+                               self.get_base_point()[0]:(self.get_base_point()[0] + self.env_info.app_img_wh[0])]
 
     def reset_base_point(self):
         xy = ImgHandle.find_img(
@@ -350,10 +351,29 @@ def retry(func, count=1, delay=0):
     return False
 
 
-def log_error_screen(name):
-    img = pyautogui.screenshot()  # x,y,w,h
-    img.save(time.strftime('err_%m%d%H%M%S_',
-                           time.localtime()) + name + '.png')
+class ErrorImgSave():
+    prefix = None
+    save_dir = None
+
+    def __init__(self, prefix='default', root_dir='err_img') -> None:
+        self.save_dir = root_dir+'/'+prefix
+        os.makedirs(self.save_dir, exist_ok=True)
+
+    def get_save_file_path(self, info='') -> str:
+        return os.path.join(self.save_dir, time.strftime(
+            f'%m%d%H%M%S_{info}.png', time.localtime()))
+
+    def screen(self):
+        img = pyautogui.screenshot()  # x,y,w,h
+        img.save(self.get_save_file_path())
+
+    def img(self, img, info=''):
+        if type(img) == str:
+            img = cv.imread(img)
+        else:
+            pass
+
+        cv.imwrite(self.get_save_file_path(info), img)
 
 
 def kick_ass():
@@ -364,8 +384,8 @@ def kick_ass():
 # 点击一个无关紧要的地方
 def kick_all():
     logging.info('need final solution')
-    log_error_screen('kick_all')
-    xy = g_resource.env_info.app_img_xy
+    ErrorImgSave('kick_all').screen()
+    xy = g_resource.env_info.app_img_wh
     for x in range(1, xy[0]-1, xy[0] // 9):
         for y in range(1, xy[1]-1, xy[1] // 16):
             OperationLeftClick([x, y], delay=0.01).action()

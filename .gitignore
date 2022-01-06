@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 screenshot.png
 config.json
+err_img/
